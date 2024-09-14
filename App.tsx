@@ -1,118 +1,244 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import { useState } from 'react'
+// import './global.css';
+// import { GluestackUIProvider } from "@/'components/ui'/gluestack-ui-provider";
+import { GluestackUIProvider } from './components/ui/gluestack-ui-provider';
+import { StyleSheet, Text, View, } from 'react-native'
+import { number, object, } from 'yup'
+import { Input, InputField, InputSlot, InputIcon } from './components/ui/input';
+import { Radio, RadioIcon } from './components/ui/radio';
+import BouncyCheckbox from "react-native-bouncy-checkbox";
+import { Button, ButtonText } from './components/ui/button';
+let passwordSchema = object({
+  passwordLength: number()
+    .min(4, 'should be min of 4 characters')
+    .max(16, 'should be max of 16 characters')
+    .required('length is required')
+})
+export default function App() {
+  const [password, setPassword] = useState('')
+  const [isPasswordGenerated, setIsPasswordGenerated] = useState(false)
+  const [lowercase, setLowercase] = useState(true)
+  const [upperCase, setUpperCase] = useState(false)
+  const [numbers, setNumbers] = useState(false)
+  const [symbols, setSymbols] = useState(false)
+  const [passwordLength, setPasswordLength] = useState('')
+  const generatePasswordString = (passwordLength: number) => {
+    let generatedString = ''
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+    const uppercase_letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+    const lowercase_letters = "abcdefghijklmnopqrstuvwxyz"
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+    const Numbers = "0123456789"
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+    const special_characters = "!@#$%^&*"
+
+    if (upperCase) {
+      generatedString += uppercase_letters
+    }
+    if (lowercase) {
+      generatedString += lowercase_letters
+    }
+    if (numbers) {
+      generatedString += Numbers
+    }
+    if (symbols) {
+      generatedString += special_characters
+    }
+
+    const passwordResult = createPassword(generatedString, passwordLength)
+    console.log(passwordResult);
+    
+    setPassword(passwordResult)
+    setIsPasswordGenerated(true)
+  }
+  const createPassword = (characters: string, passwordLength: number) => {
+    let generatedPassword = ''
+
+    for (let i = 0; i < passwordLength; i++) {
+      const charIndex = Math.round(Math.random() * characters.length)
+      generatedPassword += characters.charAt(charIndex)
+    }
+    return generatedPassword
+  }
+  const resetPasswordstate = () => {
+    setUpperCase(false)
+    setLowercase(true)
+    setPassword('')
+    setIsPasswordGenerated(false)
+    setNumbers(false)
+    setSymbols(false)
+    setPasswordLength('')
+  }
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+    <GluestackUIProvider mode="light" style={styles.mainContainer} >
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+      <View style={styles.container1}>
+        <Text style={styles.labelText}>Password Length:</Text>
+        <Input
+          style={styles.inputLength}
+          variant='rounded'
+          size="sm"
+          isDisabled={false}
+          isInvalid={false}
+          isReadOnly={false}
+        >
+          <InputField
+            onChangeText={(text) => {
+              setPasswordLength(text)
+            }}
+            value={passwordLength}
+            placeholder='Enter length'
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+          />
+        </Input>
+        {/* <View style={styles.inputWrapper}>
+            
+        </View> */}
 
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+      <View style={styles.container2}>
+        <Text style={styles.radioLabelText}>Include LowerCase</Text>
+        <BouncyCheckbox
+          isChecked={lowercase}
+          onPress={() => {
+            setLowercase(!lowercase)
+          }}
+          fillColor='#29AB87'
+        />
+      </View>
+      <View style={styles.container2}>
+        <Text style={styles.radioLabelText}>Include UpperCase</Text>
+        <BouncyCheckbox
+          style={styles.CheckBox2}
+          isChecked={upperCase}
+          onPress={() => {
+            setUpperCase(!upperCase)
+          }}
+          fillColor='#29AB87'
+        />
+      </View>
+      <View style={styles.container2}>
+        <Text style={styles.radioLabelText}>Include Numbers</Text>
+        <BouncyCheckbox
+          style={styles.CheckBox3}
+          isChecked={numbers}
+          onPress={() => {
+            setNumbers(!numbers)
+          }}
+          fillColor='#29AB87'
+        />
+      </View>
+      <View style={styles.container2}>
+        <Text style={styles.radioLabelText}>Include Symbols</Text>
+        <BouncyCheckbox
+          style={styles.CheckBox4}
+          isChecked={symbols}
+          onPress={() => {
+            setSymbols(!symbols)
+          }}
+          fillColor='#29AB87'
+        />
+      </View>
+      <View style={styles.container3}>
+        <Button
+          onPress={() => {
+            generatePasswordString(Number(passwordLength))
+          }}
+          style={styles.Button1} size="md" variant="solid" action="primary">
+          <ButtonText>Generate Password</ButtonText>
+        </Button>
+        <Button
+          onPress={() => {
+            resetPasswordstate()
+          }}
+          style={styles.Button2} size="md" variant="solid" action="primary">
+          <ButtonText>Reset</ButtonText>
+        </Button>
+      </View>
+      <View style={styles.container4}>
+        <Text selectable style={styles.finalPassword}>{password}</Text>
+      </View>
+
+    </GluestackUIProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
+  mainContainer:{
+     backgroundColor:'white'
   },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
+  container1: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 10,
+    backgroundColor: 'purple',
+    padding: 20
   },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
+  labelText: {
+    marginTop: 10,
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: 'white'
   },
-  highlight: {
-    fontWeight: '700',
+  inputLength: {
+    backgroundColor: 'white',
+    width: 150
   },
-});
 
-export default App;
+  container2: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 20,
+    backgroundColor: 'white',
+    padding: 10
+  },
+
+  radioLabelText: {
+    color: 'green',
+    fontSize: 18,
+    fontWeight: '600'
+  },
+
+  CheckBox2: {
+    marginLeft: 5
+  },
+  CheckBox3: {
+    marginLeft: 20
+  },
+  CheckBox4: {
+    marginLeft: 25
+  },
+
+  container3: {
+    flexDirection: 'row',
+    justifyContent: 'space-around'
+  },
+
+  Button1: {
+    backgroundColor: 'grey',
+    padding: 10,
+    borderRadius: 5,
+
+  },
+
+  Button2: {
+    backgroundColor: 'grey',
+    padding: 10,
+    borderRadius: 5,
+
+  },
+  container4:{
+    justifyContent:'center',
+    alignItems:'center',
+    // backgroundColor:'red',
+    marginVertical:20,
+    padding:10,
+  },
+  finalPassword:{
+    fontSize:20,
+    fontWeight:'bold',
+    color:'black '
+  }
+})
+
